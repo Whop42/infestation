@@ -17,7 +17,7 @@ export function Main({ title = "Infestation", children }: MainProps) {
             <meta name="author" content="whop42" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         </head>
-        <body class="">
+        <body class="bg-slate-900 ">
             {children}
         </body>
     </>
