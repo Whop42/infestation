@@ -14,6 +14,7 @@ type RoomType = {
     name: string,
     files: CodeFile[],
     workers: Worker[],
+    gridState: string[][]
 }
 
 type CodeFile = {
@@ -51,6 +52,9 @@ export const handler: Handlers = {
 
         createWorkers(roomName);
 
+        // TODO: make a form for this instead?
+        runWorkers(roomName);
+
         return new Response(null, {
             status: 303,
             headers: {
@@ -71,32 +75,28 @@ function createWorkers(roomName: string) {
 
         const text = await file.file.text()
 
-        const worker = new Worker(URL.createObjectURL(new Blob([text], {type: "application/typescript"})), {type: "module"});
+        const worker: Worker = new Worker(URL.createObjectURL(new Blob([text], {type: "application/typescript"})), {type: "module"});
         roomWorkers.push(worker);
-        try {
-            worker.postMessage({type: "ATTACK"});
-        } catch(error) {
-            console.log("oops");
-        }
     })
 }
 
-// function runWorkers(room: string): string[][] | undefined {
-//     const roomWorkers = workers.get(room);
-//     let gridState = gridStates.get(room);
+function runWorkers(roomName: string): string[][] | undefined {
+    const room: RoomType = rooms.find((room: RoomType) => room.name === roomName)
+    const roomWorkers: Worker[] = room.workers;
+    let gridState: string[][] = room.gridState;
 
-//     roomWorkers?.forEach((worker: Worker, file: string) => {
-//         console.log("running " + file);
+    roomWorkers?.forEach((worker: Worker) => {
+        console.log("running " + roomWorkers.indexOf(worker));
 
-//         // worker.postMessage({
-//         //     gridState: gridState,
-//         //     virusPosition: 
-//         // })
+        // worker.postMessage({
+        //     gridState: gridState,
+        //     virusPosition: 
+        // })
 
-//     });
+    });
 
-//     return gridState;
-// }
+    return gridState;
+}
 
 function ensureRoom(roomName: string) {
     if(!rooms.find((room) => room.name === roomName)) {
@@ -133,7 +133,7 @@ export default function Room(props: PageProps) {
         <main>
             <h1>Room: {roomName}</h1>
 
-            <Board />
+            <Board content={room.gridState}/>
 
             <form method="post" encType="multipart/form-data">
                 <label for="code">Upload file: </label>
