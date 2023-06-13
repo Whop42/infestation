@@ -1,11 +1,9 @@
-import { ComponentChildren, JSX } from "preact";
-
 type BoardProps = {
     content?: string[][]
 }
 
 
-export function Board({ content = [[".", "."],[".", "."]] }: BoardProps) {
+export default function Board({ content = [[".", "."],[".", "."]] }: BoardProps) {
     const gridSize = content.length; // Assuming square grid
 
     return (
