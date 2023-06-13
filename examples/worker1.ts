@@ -13,7 +13,7 @@ self.onmessage = (event) => {
 function main(gridState: string[][]): string[][] {
     for(let y = 0; y < gridState.length; y++) {
         for(let x = 0; x < gridState[0].length; x++) {
-            if()
+            console.log("hi");
         }
     }
 
