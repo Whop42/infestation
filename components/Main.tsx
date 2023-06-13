@@ -22,4 +22,4 @@ export function Main({ title = "Infestation", children }: MainProps) {
         </body>
     </>
   );
-}>
+}
