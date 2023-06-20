@@ -3,6 +3,7 @@ import Board  from "../../islands/Board.tsx";
 import { MultipartReader } from "https://deno.land/std@0.84.0/mime/mod.ts";
 import { multiParser, Form, FormFile } from 'https://deno.land/x/multiparser@0.114.0/mod.ts'
 import { CatchClause } from "https://deno.land/x/ts_morph@17.0.1/ts_morph.js";
+import { useEffect } from "https://esm.sh/v118/preact@10.13.1/hooks/src/index.js";
 
 let data = new Map<string, Array<string>>();
 let gridStates = new Map<string, string[][]>();
@@ -65,6 +66,20 @@ export const handler: Handlers = {
     }
 }
 
+function initBoard(roomName: string): void {
+    const room: RoomType = rooms.find((room) => room.name === roomName);
+
+    let gridState: Array<Array<string>> = [];
+    for(let i = 0; i < height; i++) {
+        gridState[i] = [];
+        for(let j = 0; j < width; j++) {
+            gridState[i][j] = "_";
+        }
+    }
+
+    room.gridState = gridState;
+}
+
 function createWorkers(roomName: string) {
     const room = rooms.find((room) => room.name === roomName);
 
@@ -88,10 +103,7 @@ function runWorkers(roomName: string): string[][] | undefined {
     roomWorkers?.forEach((worker: Worker) => {
         console.log("running " + roomWorkers.indexOf(worker));
 
-        // worker.postMessage({
-        //     gridState: gridState,
-        //     virusPosition: 
-        // })
+
 
     });
 
@@ -104,11 +116,14 @@ function ensureRoom(roomName: string) {
             name: roomName,
             files: new Array<File>(),
             workers: new Array<Worker>(),
+            gridState: new Array<Array<string>>(),
         }
 
         rooms.push(newRoom);
     }
 }
+
+
 
 export default function Room(props: PageProps) {
     const { roomName } = props.params;
@@ -129,6 +144,10 @@ export default function Room(props: PageProps) {
 
     const room: RoomType = rooms.find((room: RoomType) => room.name === roomName);
 
+    if(room.gridState?.length < height) {
+        initBoard(roomName);
+    }
+
     return (
         <main>
             <h1>Room: {roomName}</h1>
@@ -136,13 +155,14 @@ export default function Room(props: PageProps) {
             <Board content={room.gridState}/>
 
             <form method="post" encType="multipart/form-data">
+   
                 <label for="code">Upload file: </label>
                 <input name="code" type="file" accept=".ts"></input>
                 <input type="submit" name="submit" value="submit"></input>
             </form>
             <br />
             <div>
-                {JSON.stringify(rooms)}
+                {JSON.stringify(room)}
             </div>
         </main>
     );
